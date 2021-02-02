@@ -65,7 +65,7 @@ ls | grep -v comps.xml | xargs sudo rm -rf
 cd $CENTOS_CUSTOM_PATH
 sudo createrepo -g repodata/comps.xml $CENTOS_CUSTOM_PATH || { cleanup ; exit 1 ; }
 
-sudo cp /vagrant/cento.ks $CENTOS_CUSTOM_PATH/ks.cfg
+sudo cp /vagrant/centos.ks $CENTOS_CUSTOM_PATH/ks.cfg
 
 sudo sed -i -e '
 s,timeout 600,timeout 1,
