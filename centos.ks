@@ -1,41 +1,32 @@
-# Tell anaconda we're doing a fresh install and not an upgrade
-# Set the root password! Remember to change this once the install has completed!
-# python -c 'import crypt; print(crypt.crypt("My Password", "$6$My salt"))'
-
 # installation options
-install
 text
-cdrom
-logging  --level=debug
-repo --name="CentOS7" --baseurl=file:///mnt/source --cost=100
+url    --url="https://ftp.plusline.net/centos-stream/9-stream/BaseOS/x86_64/os"
+repo   --name="AppStream" --baseurl="https://ftp.plusline.net/centos-stream/9-stream/AppStream/x86_64/os"
+reboot --eject
 
 # config system
 keyboard de
 lang en_US.UTF-8
-timezone   --utc Europe/Berlin
-rootpw     --iscrypted $6Xe976bw.6V2
-network    --bootproto=dhcp
-# network  --device=eth0 --bootproto=static --ip=10.1.2.3 --netmask=255.255.255.0 --gateway=10.1.2.1 --nameserver=8.8.8.8 --onboot=yes
-firstboot  --disabled
-# firewall --disabled
-authconfig --enableshadow --passalgo=sha512
-# selinux  --permissive
-# services --disabled NetworkManager --enabled sshd
-services   --enabled sshd
+timezone --utc Europe/Berlin
+rootpw   --plaintext change_me
+network  --bootproto=dhcp
 
 # partitioning
-bootloader --location=mbr --driveorder=sda --append="crashkernel=auto rhgb quiet"
 zerombr
-clearpart  --all --initlabel --drives=sda
-autopart   --type=lvm --nohome  
+clearpart --all --initlabel
+autopart  --nohome --noswap
 
 # install packages
 %packages
 @core
-puppet-agent
-open-vm-tools
-net-tools
-perl
 %end
 
-reboot --eject
+# enable Kdump
+%addon com_redhat_kdump --enable --reserve-mb='auto'
+%end
+
+%post
+# install puppet
+dnf install -y https://yum.puppetlabs.com/puppet7-release-el-9.noarch.rpm
+dnf install -y puppet-agent puppet-bolt
+%end
